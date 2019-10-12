@@ -1,4 +1,4 @@
-FROM golang:1.10-stretch
+FROM golang:1.12-stretch
 
 RUN dpkg --add-architecture armel \
     && dpkg --add-architecture armhf \
@@ -45,7 +45,7 @@ RUN cd /tmp \
     && rm -rf /tmp/bats
 
 # install criu
-ENV CRIU_VERSION v3.11
+ENV CRIU_VERSION v3.12
 RUN mkdir -p /usr/src/criu \
     && curl -sSL https://github.com/checkpoint-restore/criu/archive/${CRIU_VERSION}.tar.gz | tar -v -C /usr/src/criu/ -xz --strip-components=1 \
     && cd /usr/src/criu \

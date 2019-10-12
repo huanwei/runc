@@ -114,6 +114,9 @@ func (m *mockProcess) externalDescriptors() []string {
 func (m *mockProcess) setExternalDescriptors(newFds []string) {
 }
 
+func (m *mockProcess) forwardChildLogs() {
+}
+
 func TestGetContainerPids(t *testing.T) {
 	container := &linuxContainer{
 		id:            "myid",
@@ -167,7 +170,7 @@ func TestGetContainerStats(t *testing.T) {
 			t.Fatal("intel rdt stats are nil")
 		}
 		if stats.IntelRdtStats.L3CacheSchema != "L3:0=f;1=f0" {
-			t.Fatalf("expected L3CacheSchema L3:0=f;1=f0 but recevied %s", stats.IntelRdtStats.L3CacheSchema)
+			t.Fatalf("expected L3CacheSchema L3:0=f;1=f0 but received %s", stats.IntelRdtStats.L3CacheSchema)
 		}
 	}
 	if intelrdt.IsMbaEnabled() {
@@ -175,7 +178,7 @@ func TestGetContainerStats(t *testing.T) {
 			t.Fatal("intel rdt stats are nil")
 		}
 		if stats.IntelRdtStats.MemBwSchema != "MB:0=20;1=70" {
-			t.Fatalf("expected MemBwSchema MB:0=20;1=70 but recevied %s", stats.IntelRdtStats.MemBwSchema)
+			t.Fatalf("expected MemBwSchema MB:0=20;1=70 but received %s", stats.IntelRdtStats.MemBwSchema)
 		}
 	}
 }
@@ -197,6 +200,7 @@ func TestGetContainerState(t *testing.T) {
 				{Type: configs.NEWUTS},
 				// emulate host for IPC
 				//{Type: configs.NEWIPC},
+				{Type: configs.NEWCGROUP},
 			},
 		},
 		initProcess: &mockProcess{
@@ -275,6 +279,8 @@ func TestGetContainerState(t *testing.T) {
 				file = "user"
 			case configs.NEWUTS:
 				file = "uts"
+			case configs.NEWCGROUP:
+				file = "cgroup"
 			}
 			expected := fmt.Sprintf("/proc/%d/ns/%s", pid, file)
 			if expected != path {
